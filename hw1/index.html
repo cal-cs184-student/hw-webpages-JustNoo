@@ -55,10 +55,10 @@
 
 		This algorithm is as efficient as any bounding box sampler because it strictly limits its search space to the smallest rectangle enclosing the triangle. By setting the loop boundaries to the vertex extremes, the code avoids testing any pixels globally across the framebuffer. It performs the minimum necessary point-in-triangle tests to ensure full coverage without wasting cycles on pixels guaranteed to be outside the triangle’s immediate area.
 
-		For the extra credit, I implemented Incremental Triangle Traversal to optimize the rasterization loop. In the basic implementation, the line equation \[ L(x,y) = -(x - X_i)dY_i + (y - Y_i)dX_i \] is recomputed for every pixel, requiring expensive floating--point multiplications. Observing that the line equation is linear, I factored these redundant operations out of the inner loop. When moving from \((x,y) \) to \( (x+1,y) )\, the value changes by a constant \( -dY_i$ \), and moving to the next row changes it by \( +dX_i \). By precomputing these edge derivatives and the initial values at the bounding box corner, the per--pixel work reduces to only three additions, significantly lowering CPU cycles and accelerating the rasterization process.
+		For the extra credit, I implemented Incremental Triangle Traversal to optimize the rasterization loop. In the basic implementation, the line equation \[ L(x,y) = -(x - X_i)dY_i + (y - Y_i)dX_i \] is recomputed for every pixel, requiring expensive floating--point multiplications. Observing that the line equation is linear, I factored these redundant operations out of the inner loop. When moving from \((x,y) \) to \( (x+1,y) \), the value changes by a constant \( -dY_i$ \), and moving to the next row changes it by \( +dX_i \). By precomputing these edge derivatives and the initial values at the bounding box corner, the per--pixel work reduces to only three additions, significantly lowering CPU cycles and accelerating the rasterization process.
 		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
-			<img src="t1.jpg" width="400px"/>
+			<img src="t1.png" width="400px"/>
 				  <figcaption>basic/test4.svg</figcaption>
 		</div>
 		
