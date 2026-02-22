@@ -43,7 +43,7 @@
 		-->
 
 		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
+		This homework gives practice with triangle rasterization, both for designing new images and rendering existing ones. We learned how to texture map, and discovered different methods of antialiasing in order to provide the highest quality image, free of artifacts. As a formerly quite avid PC gamer, I found all of the antialiasing and smoothing techniques very interesting – I have used them in graphics settings for years without really understanding their functions like I do now! 
 
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
 		To rasterize a triangle, I first calculate a bounding box by finding the minimum and maximum x and y coordinates of its vertices. I iterate through every pixel in this box, sampling at the center (x+0.5,y+0.5). For each sample, I apply three line equations to check if the point lies on the same side of all edges. If the point is inside, regardless of vertex winding order, I fill the corresponding pixel.
