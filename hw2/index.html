@@ -28,89 +28,158 @@
 	<body>
 		<div class="container">
 		<h1>CS184/284A Spring 2025 Homework 2 Write-Up</h1>
-		<div style="text-align: center;">Names: </div>
+		<div style="text-align: center;">Luca Herden</div>
 
 		<br>
 
-		Link to webpage: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to webpage: <a href="https://cal-cs184-student.github.io/hw-webpages-JustNoo/hw2/index.html">https://cal-cs184-student.github.io/hw-webpages-JustNoo/hw2/index.html</a>
 
 		<br>
 		
-		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
-
-		<figure>
-			<img src="teapot.png" alt="Teapot" style="width:50%"/>
-			<figcaption>You can add images with captions!</figcaption>
-		</figure>
+		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/hw-webpages-JustNoo">https://github.com/cal-cs184-student/hw-webpages-JustNoo</a>
 
 		<!--
 		We've already added one heading per part, to make your write-up as navigable when grading. Please fit your write-up within these sections!
 		-->
 
 		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
+		In this assignment, I implemented two major surface representations and several geometric operations on meshes. 
+		In Section I, I implemented de Casteljau's algorithm to evaluate Bezier curves and Bezier surfaces. 
+		In Section II, I implemented local remeshing operations (edge flip and edge split), area-weighted vertex normals for smooth shading, and Loop subdivision for mesh upsampling using the half-edge data structure.
+		This gave me a lot of insight as to the differences between these two styles of surface representation. It was very rewarding to play with the GUI and see the results visually, especially after struggling through pointer debugging in edge splits and subdivision!
 
 		<h2>Section I: Bezier Curves and Surfaces</h2>
 
 		<h3>Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		De Casteljau's algorithm evaluates a Bezier curve using repeated linear interpolation between adjacent control points. Given control points \(p_0, p_1, ..., p_n\) and parameter \(t\), one subdivision step computes \[p_i'=(1-t)p_i+tp_(i+1)\] This produces a new set of \(n\) points. Repeating this process recursively reduces the number of points by one each level until only a single point remains. That final point lies on the Bezier curve at parameter \(t\). 
+		This was implemented in BezierCurve::evaluateStep, which iterates over adjacent pairs of control points, linearly interpolates them with parameter \(t\), and returns the next level of intermediate points. 
 
-		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="p11.png" width="400px"/>
+				  <figcaption>Step 1 Evaluation</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="p12.png" width="400px"/>
+				  <figcaption>Step 2 Evaluation</figcaption>
 				</td>
 			  </tr>
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="p13.png" width="400px"/>
+				  <figcaption>Step 3 Evaluation</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="p14.png" width="400px"/>
+				  <figcaption>Step 4 Evaluation</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="p15.png" width="400px"/>
+				  <figcaption>Step 5 Evaluation</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="p16.png" width="400px"/>
+				  <figcaption>Step 6 Evaluation</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="p17.png" width="400px"/>
+				  <figcaption>Curve shown</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="p18changed.png" width="400px"/>
+				  <figcaption>Modified control points and parameter</figcaption>
 				</td>
 			  </tr>
 			</table>
 		</div>
 
 		<h3>Part 2: Bezier surfaces with separable 1D de Casteljau</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		A Bezier surface is defined by an n x n grid of control points. To evaluate the surface at parameters (u, v), we treat each row of control points as a Bezier curve in parameter u, evaluate each row to obtain one point per row, treat those resulting points as a Bezier curve in parameter v, and evaluate that curve to obtain the final surface point. I implemented this in evaluateStep, evaluate1D, and evaluate, with similar logic to the 1D curve from part 1. 
+		<figure>
+			<img src="p2.png" alt="Teapot" style="width:50%"/>
+			<figcaption>Teapot.bez</figcaption>
+		</figure>
 
 		<h2>Section II: Triangle Meshes and Half-Edge Data Structure</h2>
 
 		<h3>Part 3: Area-weighted vertex normals</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		To compute smooth/Phong shading, we approximate a vertex normal by averaging the normals of incident triangles, weighted by their areas. For a triangle with vertices \(a\), \(b\), and \(c\), \(n = (p_1 - p_0) * (p_2 - p_0)\). This cross product produces a vector proportional to the triangle's area. I implemented this in Vertex::normal(), iterating around the vertex's ring, computing cross products for each interior face, and normalizing the result. 
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="p31.png" width="400px"/>
+				  <figcaption>Flat Shading</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="p32.png" width="400px"/>
+				  <figcaption>Smooth/Phong Shading</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
 
 		<h3>Part 4: Edge flip</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Given two adjacent triangles sharing an edge, flipping replaces the diagonal with the other diagonal. For example, triangles (a, b, c) and (c, b, d) would be transformed into triangles (a, d, c) and (a, b, d). In flipEdge(), I implemented it by collecting halfedges, vertices, and faces, and rewiring pointers to create the desired effect. I initially experienced crashes caused by incorrect next() cycles and forgetting to update halfedges, but was able to eventually verify each face had 3 halfedges and all cycles were closed!
+		
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="p41.png" width="400px"/>
+				  <figcaption>Normal Teapot</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="p42.png" width="400px"/>
+				  <figcaption>Flipped Teapot</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
 
 		<h3>Part 5: Edge split</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Splitting an edge inserts midpoint vertices and divides triangles, adding new edges and faces. While this is similar to the last part on the logic, I had more debugging issues, like inconsistent face cycles, and halfedges pointing to incorrect places. 
+		
+		<figure>
+			<img src="p51.png" alt="Teapot" style="width:50%"/>
+			<figcaption>Normal Cube</figcaption>
+		</figure>
+		<figure>
+			<img src="p52.png" alt="Teapot" style="width:50%"/>
+			<figcaption>Edges Split</figcaption>
+		</figure>
+		<figure>
+			<img src="p53.png" alt="Teapot" style="width:50%"/>
+			<figcaption>Split and Flipped</figcaption>
+		</figure>
 
 		<h3>Part 6: Loop subdivision for mesh upsampling</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-		<h2>(Optional) Section III: Potential Extra Credit - Art Competition: Model something Creative</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-		<h2>Additional Notes (please remove)</h2>
-		<ul>
-			<li>You can also add code if you'd like as so: <code>code code code</code></li>
-			<li>If you'd like to add math equations, 
-				<ul>
-					<li>You can write inline equations like so: \( a^2 + b^2 = c^2 \)</li>
-					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
-				</ul>
-			</li>
-		</ul>
+		Loop subdivision computes new positions, splits edges, flips edges, and commits the new positions. I followed the 5-step approach:
+		1. Compute new positions for old vertices
+    	2. Compute edge midpoint posiitions
+		3. Split original edges
+		4. Flip new edges as needed
+		5. Commit positions
+		Over repeated subdivision, sharp corners became rounded as Loop subdivision approximates a smooth limit surface. Pre-splitting sharp edges before smoothing can reduce distortion by making it more regular. Flipping certain edges so face triangulation is consistent and symmetric ensures the cube continues to subdivide symmetrically. 
+		<figure>
+			<img src="p51.png" alt="Teapot" style="width:50%"/>
+			<figcaption>Normal Cube</figcaption>
+		</figure>
+		<figure>
+			<img src="p61.png" alt="Teapot" style="width:50%"/>
+			<figcaption>One Subdivision</figcaption>
+		</figure>
+		<figure>
+			<img src="p62.png" alt="Teapot" style="width:50%"/>
+			<figcaption>Two Subdivisions</figcaption>
+		</figure>
 		</div>
 	</body>
 </html>
